@@ -1,11 +1,12 @@
 import { Overlay, ModalDiv } from "./Modal.styled";
 
+
 export const Modal=()=>{
-    return(
+    return( 
         <Overlay>
   <ModalDiv>
     <img src="" alt="" />
   </ModalDiv>
 </Overlay>
-    )
+ )
 }
