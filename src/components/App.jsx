@@ -1,13 +1,13 @@
 import {Component} from  "react";
 import {Loader} from "./Loader/Loader";
 import {Searchbar} from "./Searchbar/Searchbar";
-//import { GalleryItem } from "./ImageGalleryItem/ImageGalleryItem";
-//import { Gallery } from "./ImageGallery/ImageGallery";
+import { GalleryItem } from "./ImageGalleryItem/ImageGalleryItem";
+import { Gallery } from "./ImageGallery/ImageGallery";
 //import {Modal} from "./Modal/Modal";
 import axios from "axios";
 
 
-import api from "../services/api";
+import fetchImagesWithQuery from "../services/api";
 
 export class App extends Component {
 
@@ -26,7 +26,7 @@ export class App extends Component {
       this.setState({ isLoading: true });
 
       try {
-          const images = await api.fetchImagesWithQuery(this.state.searchQuery,this.state.page);
+          const images = await fetchImagesWithQuery(this.state.searchQuery,this.state.page);
 
           this.setState(({hits})=>({
             hits:[...hits, ...images.hits]
@@ -52,29 +52,27 @@ async componentDidUpdate(_, prevState) {
           await this.fetchData();
       }, 500);
   }
-//   if (this.state.data.length !== prevState.page) {
-//     this.setState({page: this.state.data.length})
-// }
 }
-
-  handleSetSearchQuery = event => {
-    this.setState({ searchQuery: event.target.value });
-};
 
 onHandleSubmit= event =>{
   event.preventDefault();
-  this.setState({ searchQuery: event.target.value });
-  
-  
-}
+  const { queryInput } = event.target.elements;
+
+    const searchQuery = queryInput.value;
+    queryInput.value = '';
+    const page = 1;
+  if (searchQuery === ''){
+    alert ("There are no images for your search query, please, try again.")
+  }
+    this.setState({ searchQuery, page, hits: [] });
+  }
   
   render(){
     return (
     <>
-    <Searchbar handleSetSearchQuery={this.handleSetSearchQuery}
-                    searchQuery={this.searchQuery}
-                    onHandleSubmit={this.onHandleSubmit}/>
-   
+    <Searchbar onHandleSubmit={this.onHandleSubmit}/>
+   <Gallery  hits={this.hits}/>
+   <GalleryItem hits={this.hits}/>
    <Loader/>
  
     </>

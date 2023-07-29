@@ -1,6 +1,6 @@
 
-// export const GalleryItem=({images})=>{
-//   return (<li key={image.id}>
-//                 <img src={image.webformatURL} alt=""/>
-//                     </li>)
-// }
+export const GalleryItem=({hits})=>{
+  return (<li key={hits.id}>
+                <img src={hits.webformatURL} alt=""/>
+                    </li>)
+}

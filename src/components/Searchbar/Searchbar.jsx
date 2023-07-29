@@ -1,13 +1,12 @@
 import {Header,Form,Button, Label, Input} from './Searchbar.styled';
 import {Component} from 'react';
-import {ImSearch} from 'react-icons/im'
-
+import {ImSearch} from 'react-icons/im';
+import propTypes from "prop-types";
 
 export class Searchbar extends Component{
- 
 
-  render(){
-    const {onHandleSubmit,handleSetSearchQuery, searchQuery}= this.props;
+render(){
+    const {onHandleSubmit}= this.props;
     return(
         <Header>
   <Form onSubmit={onHandleSubmit}>
@@ -17,15 +16,18 @@ export class Searchbar extends Component{
                                               height:25}}/>
       <Label>Search</Label>
     </Button>
-
-    <Input
+  <Input
       type="text"
-      onChange={handleSetSearchQuery}
       autocomplete="off"
       autoFocus
       placeholder="Search images and photos"
+      name='queryInput'
     />
   </Form>
   </Header>
     )
 }}
+
+Searchbar.propTypes = {
+  onHandleSubmit: propTypes.func.isRequired,
+}
