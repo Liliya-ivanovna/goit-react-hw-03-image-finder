@@ -1,11 +1,9 @@
 import {Component} from  "react";
 import {Loader} from "./Loader/Loader";
 import {Searchbar} from "./Searchbar/Searchbar";
-import { GalleryItem } from "./ImageGalleryItem/ImageGalleryItem";
 import { Gallery } from "./ImageGallery/ImageGallery";
-//import {Modal} from "./Modal/Modal";
-import axios from "axios";
-
+import { AppStyled } from "./App.styled";
+import { Button } from "./Button/Button";
 
 import fetchImagesWithQuery from "../services/api";
 
@@ -14,67 +12,89 @@ export class App extends Component {
   state={
         isLoading: false,
         isError: false,
-        error: null,
         searchQuery: "",
         hits: [],
         page:1,
+        loadMoreBtn: false,
     }
-  
-    cancelTokenSource = axios.CancelToken.source();
 
-    async fetchData() {
+   fetchData=async()=> {
+      const {searchQuery, page} = this.state;
       this.setState({ isLoading: true });
-
-      try {
-          const images = await fetchImagesWithQuery(this.state.searchQuery,this.state.page);
-
-          this.setState(({hits})=>({
-            hits:[...hits, ...images.hits]
+     try {
+          const data =await fetchImagesWithQuery(searchQuery,page);
+          const totalPages = Math.floor(data.totalHits / 12);
+          if(data.hits.length ===0){
+            alert("Sorry, there are no images matching your search query. Please try again.")
+          return;
+          }
+           this.setState(({hits})=>({
+            hits:[...hits, ...data.hits],
+            page,
+            totalPages,
           }));
+
+          if(page ===1){
+            alert(`We found ${data.totalHits} images!`)
+          }else{
+            setTimeout(()=> this.scroll(),100);
+          }
+
+          if (page >= totalPages){
+            alert("End of search results!")
+          }
       } catch (error) {
-          this.setState({ isError: true, error });
+          this.setState({ isError: true, Error });
       } finally {
           this.setState({ isLoading: false });
       }
   }
 
-  componentWillUnmount() {
-    this.cancelTokenSource.cancel('Component is being unmounted');
-}
 
-debouncedTimeout = null;
-
-async componentDidUpdate(_, prevState) {
-
-  if (this.state.searchQuery !== prevState.searchQuery || this.state.page !== prevState.page) {
-      clearTimeout(this.debouncedTimeout);
-     this.debouncedTimeout = setTimeout(async () => {
-          await this.fetchData();
-      }, 500);
+componentDidUpdate(_, prevState) {
+const {searchQuery, page}= this.state;
+  if (searchQuery !== prevState.searchQuery ||
+     page !== prevState.page) {
+      this.fetchData();
   }
-}
+};
 
 onHandleSubmit= event =>{
   event.preventDefault();
   const { queryInput } = event.target.elements;
-
     const searchQuery = queryInput.value;
     queryInput.value = '';
     const page = 1;
-  if (searchQuery === ''){
-    alert ("There are no images for your search query, please, try again.")
+  if (searchQuery.trim() === ''){
+    alert ("Enter your search query!");
+    return;
   }
     this.setState({ searchQuery, page, hits: [] });
+  };
+  
+  handleLoadMore = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
+  };
+
+  scroll = () => {
+    const { clientHeight } = document.documentElement;
+    window.scrollBy({
+      top: clientHeight - 180,
+      behavior: 'smooth',
+    });
   }
   
   render(){
+    const {isLoading,hits}= this.state;
     return (
     <>
     <Searchbar onHandleSubmit={this.onHandleSubmit}/>
-   <Gallery  hits={this.hits}/>
-   <GalleryItem hits={this.hits}/>
-   <Loader/>
- 
+    <AppStyled>
+   {isLoading ? <Loader/> :  <Gallery  hits={hits}/>}
+   <Button onLoadMore={this.handleLoadMore}/>
+   </AppStyled>
     </>
   );
 }};

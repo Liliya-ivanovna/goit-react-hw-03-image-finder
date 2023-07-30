@@ -1,16 +1,20 @@
-import { Component } from "react";
+import { GalleryItem } from "../ImageGalleryItem/ImageGalleryItem";
+import {Ul} from "./ImageGallery.styled";
+import PropTypes from 'prop-types';
 
-export class Gallery extends Component {
-    render() {
-        const {hits} = this.props;
-return (<ul>
-            {hits.length === 0 ?
-                    <h3>No images found!</h3>
-                    : hits.map(hit => {
-                    
-                })
-            }
-        </ul>)
-    }
+export const Gallery = ({hits})=>{
+  return (<Ul>{ hits.map(hit => (
+                    <GalleryItem key={hit.id} hit={hit}/>
+                        ))}
+        </Ul>) };
+
+Gallery.propTypes={
+    hits: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.number.isRequired,
+            webformatURL: PropTypes.string.isRequired,
+            tags: PropTypes.string.isRequired,
+            largeImageURL: PropTypes.string.isRequired,
+        }).isRequired
+    ),
 }
-

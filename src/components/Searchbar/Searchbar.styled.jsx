@@ -39,7 +39,7 @@ box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
   transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   outline: none;
-  &:hover {
+  &:is:hover {
     opacity: 1;
   }`
 
