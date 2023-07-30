@@ -1,4 +1,5 @@
 import {Component} from  "react";
+import Notiflix from 'notiflix';
 import {Loader} from "./Loader/Loader";
 import {Searchbar} from "./Searchbar/Searchbar";
 import { Gallery } from "./ImageGallery/ImageGallery";
@@ -25,7 +26,7 @@ export class App extends Component {
           const data =await fetchImagesWithQuery(searchQuery,page);
           const totalPages = Math.floor(data.totalHits / 12);
           if(data.hits.length ===0){
-            alert("Sorry, there are no images matching your search query. Please try again.")
+            Notiflix.Report.warning("Sorry!","There are no images matching your search query.","Try again.")
           return;
           }
            this.setState(({hits})=>({
@@ -35,13 +36,13 @@ export class App extends Component {
           }));
 
           if(page ===1){
-            alert(`We found ${data.totalHits} images!`)
+            Notiflix.Report.success("Wonderful!",`We found ${data.totalHits} images!`,"Continue")
           }else{
             setTimeout(()=> this.scroll(),100);
           }
 
           if (page >= totalPages){
-            alert("End of search results!")
+            Notiflix.Report.info("Sorry!","This is the end of search results!","Ok")
           }
       } catch (error) {
           this.setState({ isError: true, Error });
@@ -66,7 +67,7 @@ onHandleSubmit= event =>{
     queryInput.value = '';
     const page = 1;
   if (searchQuery.trim() === ''){
-    alert ("Enter your search query!");
+    Notiflix.Report.info ("Please!","Enter your search query!","Ok");
     return;
   }
     this.setState({ searchQuery, page, hits: [] });
@@ -87,13 +88,15 @@ onHandleSubmit= event =>{
   }
   
   render(){
-    const {isLoading,hits}= this.state;
+    const {isLoading,hits,page,totalPages}= this.state;
+    
     return (
     <>
     <Searchbar onHandleSubmit={this.onHandleSubmit}/>
     <AppStyled>
-   {isLoading ? <Loader/> :  <Gallery  hits={hits}/>}
-   <Button onLoadMore={this.handleLoadMore}/>
+   { hits.length !== 0 && <Gallery  hits={hits}/>}
+   {isLoading ? ( <Loader/>) : 
+   (page<totalPages && hits.length!==0 &&<Button onLoadMore={this.handleLoadMore}/>)}
    </AppStyled>
     </>
   );
