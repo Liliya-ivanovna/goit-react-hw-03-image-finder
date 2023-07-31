@@ -24,14 +24,13 @@ export class App extends Component {
       this.setState({ isLoading: true });
      try {
           const data =await fetchImagesWithQuery(searchQuery,page);
-          const totalPages = Math.floor(data.totalHits / 12);
+          const totalPages = Math.ceil(data.totalHits / 12);
           if(data.hits.length ===0){
             Notiflix.Report.warning("Sorry!","There are no images matching your search query.","Try again.")
           return;
           }
            this.setState(({hits})=>({
             hits:[...hits, ...data.hits],
-            page,
             totalPages,
           }));
 
@@ -60,17 +59,9 @@ const {searchQuery, page}= this.state;
   }
 };
 
-onHandleSubmit= event =>{
-  event.preventDefault();
-  const { queryInput } = event.target.elements;
-    const searchQuery = queryInput.value;
-    queryInput.value = '';
-    const page = 1;
-  if (searchQuery.trim() === ''){
-    Notiflix.Report.info ("Please!","Enter your search query!","Ok");
-    return;
-  }
-    this.setState({ searchQuery, page, hits: [] });
+onSubmit=searchQuery =>{
+  
+    this.setState({ searchQuery, page:1, hits: [] });
   };
   
   handleLoadMore = () => {
@@ -92,7 +83,7 @@ onHandleSubmit= event =>{
     
     return (
     <>
-    <Searchbar onHandleSubmit={this.onHandleSubmit}/>
+    <Searchbar onSubmit={this.onSubmit}/>
     <AppStyled>
    { hits.length !== 0 && <Gallery  hits={hits}/>}
    {isLoading ? ( <Loader/>) : 
